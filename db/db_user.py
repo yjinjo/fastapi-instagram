@@ -1,11 +1,11 @@
 from sqlalchemy.orm.session import Session
 from db.hash import Hash
 from schemas import UserBase
-from db.models import DBUser
+from db.models import DbUser
 
 
 def create_user(db: Session, request: UserBase):
-    new_user = DBUser(
+    new_user = DbUser(
         username=request.username,
         email=request.email,
         password=Hash.bcrypt(request.password)
@@ -18,28 +18,28 @@ def create_user(db: Session, request: UserBase):
 
 
 def get_all_users(db: Session):
-    return db.query(DBUser).all()
+    return db.query(DbUser).all()
 
 
 def get_user(db: Session, id: int):
     # Handle any exception
-    return db.query(DBUser).filter(DBUser.id == id).first()
+    return db.query(DbUser).filter(DbUser.id == id).first()
 
 
 def update_user(db: Session, id: int, request: UserBase):
-    user = db.query(DBUser).filter(DBUser.id == id)
+    user = db.query(DbUser).filter(DbUser.id == id)
     # Handle any exception
     user.update({
-        DBUser.username: request.username,
-        DBUser.email: request.email,
-        DBUser.password: Hash.bcrypt(request.password)
+        DbUser.username: request.username,
+        DbUser.email: request.email,
+        DbUser.password: Hash.bcrypt(request.password)
     })
     db.commit()
     return 'ok'
 
 
 def delete_user(db: Session, id: int):
-    user = db.query(DBUser).filter(DBUser.id == id).first()
+    user = db.query(DbUser).filter(DbUser.id == id).first()
     # Handle any exception
     db.delete(user)
     db.commit()
