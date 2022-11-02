@@ -1,6 +1,8 @@
 from typing import Optional
-from fastapi import APIRouter, status, Response
+from fastapi import APIRouter, status, Response, Depends
 from enum import Enum
+
+from router.blog_post import required_functionality
 
 router = APIRouter(
     prefix='/blog',
@@ -20,8 +22,11 @@ router = APIRouter(
     description='This api call simulates fetching all blogs.',
     response_description='The list of available blogs'
     )
-def get_all_blogs(page=1, page_size: Optional[int] = None):
-    return {'message': f'All {page_size} blogs on page {page}'}
+def get_blogs(
+        page=1,
+        page_size: Optional[int] = None,
+        req_parameter: dict = Depends(required_functionality)):
+    return {'message': f'All {page_size} blogs on page {page}', 'req': req_parameter}
 
 
 @router.get('/{id}/comments/{comment_id}', tags=['comment'])
@@ -42,13 +47,13 @@ class BlogType(str, Enum):
     howto = 'howto'
 
 
-@router.get('/type/{type}')
-def get_blog_type(type: BlogType):
+@router.get('/type/{type}', )
+def get_blog_type(type: BlogType, req_parameter: dict = Depends(required_functionality)):
     return {'message': f'Blog type {type}'}
 
 
 @router.get('/{id}', status_code=status.HTTP_200_OK)
-def get_blog(id: int, response: Response):
+def get_blog(id: int, response: Response, req_parameter: dict = Depends(required_functionality)):
     if id > 5:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {'error': f'Blog {id} not found'}
